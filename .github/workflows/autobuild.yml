@@ -1,0 +1,156 @@
+name: AutoBuild
+on:
+  push:
+    branches:
+      - main
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    env:
+      VITE_SERVER_URL: staging.quickube.sh
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "20"
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+        working-directory: .
+      - name: Build static website
+        run: npm run build
+        working-directory: .
+        env:
+          OUTPUT_DIR: dist
+      - name: Validate build output
+        run: "
+
+          \          if [ ! -d \"dist\" ]; then
+
+          \            echo \"Error: Build output directory does not exist\"
+
+          \            exit 1
+
+          \          fi
+
+          \         \ 
+
+          \          if [ ! -f \"dist/index.html\" ]; then
+
+          \            echo \"Error: index.html not found in build output\"
+
+          \            exit 1
+
+          \          fi
+
+          \         \ 
+
+          \          echo \"Build validation successful\"
+
+          \        "
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      - name: Upload to S3 with cache headers
+        run: "
+
+          \          # Upload HTML files with no caching
+
+          \          aws s3 sync dist
+          s3://bucket-c8d8983e-20241110084457653200000001 \\
+
+          \            --exclude \"*\" \\
+
+          \            --include \"*.html\" \\
+
+          \            --cache-control \"no-cache,no-store,must-revalidate\" \\
+
+          \            --delete
+
+
+          \          # Upload assets with long-term caching
+
+          \          aws s3 sync dist
+          s3://bucket-c8d8983e-20241110084457653200000001 \\
+
+          \            --exclude \"*.html\" \\
+
+          \            --include \"*.js\" \\
+
+          \            --include \"*.css\" \\
+
+          \            --include \"*.png\" \\
+
+          \            --include \"*.jpg\" \\
+
+          \            --include \"*.jpeg\" \\
+
+          \            --include \"*.gif\" \\
+
+          \            --include \"*.svg\" \\
+
+          \            --include \"*.woff\" \\
+
+          \            --include \"*.woff2\" \\
+
+          \            --cache-control \"public,max-age=31536000,immutable\" \\
+
+          \            --delete
+
+
+          \          # Upload remaining files with moderate caching
+
+          \          aws s3 sync dist
+          s3://bucket-c8d8983e-20241110084457653200000001 \\
+
+          \            --exclude \"*.html\" \\
+
+          \            --exclude \"*.js\" \\
+
+          \            --exclude \"*.css\" \\
+
+          \            --exclude \"*.png\" \\
+
+          \            --exclude \"*.jpg\" \\
+
+          \            --exclude \"*.jpeg\" \\
+
+          \            --exclude \"*.gif\" \\
+
+          \            --exclude \"*.svg\" \\
+
+          \            --exclude \"*.woff\" \\
+
+          \            --exclude \"*.woff2\" \\
+
+          \            --cache-control \"public,max-age=3600\" \\
+
+          \            --delete
+
+          \        "
+      - name: Invalidate CloudFront cache
+        run: "
+
+          \          if [ -n EWCU6ME6GJ5P2 ]; then
+
+          \            aws cloudfront create-invalidation \\
+
+          \              --distribution-id EWCU6ME6GJ5P2 \\
+
+          \              --paths \"/*\"
+
+          \            echo \"CloudFront cache invalidation initiated\"
+
+          \          else
+
+          \            echo \"No CloudFront distribution ID provided, skipping
+          cache invalidation\"
+
+          \          fi
+
+          \        "
