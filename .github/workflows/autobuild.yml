@@ -7,7 +7,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      VITE_SERVER_URL: https://staging.quickube.sh
+      VITE_SERVER_URL: http://staging.quickube.sh
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
