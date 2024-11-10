@@ -6,7 +6,8 @@ const SERVER_PORT = import.meta.env.VITE_SERVER_PORT;
 
 export const useCastVote = () => {
     const castVote = async (candidateName: string) => {
-        return axios.post(`${SERVER_URL}:${SERVER_PORT}/api/cast`, {
+        const port = SERVER_PORT ? `:${SERVER_PORT}` : "";
+        return axios.post(`${SERVER_URL}${port}/api/cast`, {
             "vote": candidateName
         });
     }
