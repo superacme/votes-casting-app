@@ -1,13 +1,13 @@
-import {useEffect, useState} from 'react'
-import './App.css'
-import {useCastVote} from "./services/use-cast-vote.ts";
+import { useEffect, useState } from 'react';
+import './App.css';
+import { useCastVote } from "./services/use-cast-vote.ts";
 import classNames from 'classnames';
 
 export const App = () => {
     const [vote, setVote] = useState("");
     const [count, setCount] = useState(0);
     const [visible, setVisible] = useState(false);
-    const {castVote} = useCastVote();
+    const { castVote } = useCastVote();
 
     const castYourVote = (vote: string) => {
         setCount(prev => prev + 1);
@@ -17,10 +17,12 @@ export const App = () => {
     }
 
     useEffect(() => {
-        if(visible) {
+        if (visible) {
             setVisible(false);
         }
     }, [visible]);
+
+    const base_url = import.meta.env.BASE_URL.replace(/\/$/, '');
 
     return (
         <>
@@ -32,7 +34,7 @@ export const App = () => {
                             <div>
                                 <img
                                     alt=""
-                                    src="/vote/fudd.png"
+                                    src={`${base_url}/fudd.png`}
                                     className="inline-block h-20 w-20 rounded-full"
                                 />
                             </div>
@@ -47,7 +49,7 @@ export const App = () => {
                             <div>
                                 <img
                                     alt=""
-                                    src="/vote/bugs.jpg"
+                                    src={`${base_url}/bugs.jpg`}
                                     className="inline-block h-20 w-20 rounded-full"
                                 />
                             </div>
@@ -59,13 +61,13 @@ export const App = () => {
                     </button>
                 </div>
                 <div className={"relative h-12"}>
-                {vote && <p key={count}
-                    className={classNames(
-                        "text-xl font-large text-gray-700 transition ease-in-out delay-150",
-                        {
-                            "fadeOut": !visible,
-                            "fadeIn": visible
-                        })}>You voted for {vote}</p>}
+                    {vote && <p key={count}
+                                className={classNames(
+                                    "text-xl font-large text-gray-700 transition ease-in-out delay-150",
+                                    {
+                                        "fadeOut": !visible,
+                                        "fadeIn": visible
+                                    })}>You voted for {vote}</p>}
                 </div>
             </div>
         </>
