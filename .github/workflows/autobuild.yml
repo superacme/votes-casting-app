@@ -7,7 +7,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     env:
-      VITE_SERVER_URL: http://localhost.kblocks.io
+      VITE_SERVER_URL: http://voting.localhost.kblocks.io
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
