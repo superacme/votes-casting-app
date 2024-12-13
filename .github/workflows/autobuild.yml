@@ -62,7 +62,7 @@ jobs:
           \          # Upload HTML files with no caching
 
           \          aws s3 sync dist
-          s3://bucket-c82ee89d-20241213121528197200000001 \\
+          s3://bucket-c82ee89d-20241213131250583700000001 \\
 
           \            --exclude \"*\" \\
 
@@ -76,7 +76,7 @@ jobs:
           \          # Upload assets with long-term caching
 
           \          aws s3 sync dist
-          s3://bucket-c82ee89d-20241213121528197200000001 \\
+          s3://bucket-c82ee89d-20241213131250583700000001 \\
 
           \            --exclude \"*.html\" \\
 
@@ -106,7 +106,7 @@ jobs:
           \          # Upload remaining files with moderate caching
 
           \          aws s3 sync dist
-          s3://bucket-c82ee89d-20241213121528197200000001 \\
+          s3://bucket-c82ee89d-20241213131250583700000001 \\
 
           \            --exclude \"*.html\" \\
 
